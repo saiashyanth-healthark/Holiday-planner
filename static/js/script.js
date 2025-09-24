@@ -149,17 +149,24 @@ function setupEventListeners() {
     document.getElementById('generateResults').addEventListener('click', generateResults);
 }
 
+// Replace your old function with this corrected version in script.js
+
 function filterHolidaysByState() {
+    // Ensure the public holidays list is completely empty before we begin
+    publicHolidays = [];
+    
     const yearData = holidayData[selectedYear];
     if (!yearData) {
-        publicHolidays = [];
         updateHolidaysList();
-        renderCalendar();
+        renderCalendar(); // Render an empty calendar if the year is invalid
         return;
     }
+
     const national = yearData.nationalHolidays;
     const database = yearData.holidayDatabase;
     const selectedStateCode = document.getElementById('stateSelect').value;
+    
+    // Get only the holidays for the selected state
     const stateSpecificHolidays = database[selectedStateCode] || [];
     
     let combinedHolidays;
@@ -169,6 +176,7 @@ function filterHolidaysByState() {
         combinedHolidays = [...national, ...stateSpecificHolidays];
     }
     
+    // Group holidays by date to remove any duplicates
     const groupedHolidays = combinedHolidays.reduce((acc, holiday) => {
         if (!acc[holiday.date]) {
             acc[holiday.date] = [];
@@ -177,15 +185,17 @@ function filterHolidaysByState() {
         return acc;
     }, {});
 
+    // Create the final, clean publicHolidays array
     publicHolidays = Object.keys(groupedHolidays).map(date => ({
         date: date,
         names: [...new Set(groupedHolidays[date])]
     }));
 
+    // --- THIS IS THE KEY PART ---
+    // After updating the list, we MUST tell the calendar to redraw itself.
     updateHolidaysList();
-    renderCalendar();
+    renderCalendar(); // This line forces the calendar to sync with the new state's holidays.
 }
-
 // (Find this function in your script.js and replace it)
 function updateHolidaysList() {
     const holidaysList = document.getElementById('holidaysList');
@@ -229,30 +239,60 @@ function removePublicHoliday(dateToRemove) {
     updateHolidaysList();
     renderCalendar();
 }
+// Replace the entire old function with this one in script.js
 
 function renderCalendar() {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     document.getElementById('calendarMonth').textContent = `${monthNames[currentMonth]} ${currentYear}`;
+    
     const firstDay = new Date(currentYear, currentMonth, 1);
     const calendarDates = document.getElementById('calendarDates');
     calendarDates.innerHTML = '';
+    
     let dayOfWeek = firstDay.getDay();
-    if (dayOfWeek === 0) dayOfWeek = 6; else dayOfWeek--;
-    for (let i = 0; i < dayOfWeek; i++) { calendarDates.insertAdjacentHTML('beforeend', '<div class="calendar-date other-month"></div>'); }
+    if (dayOfWeek === 0) {
+        dayOfWeek = 6;
+    } else {
+        dayOfWeek--;
+    }
+
+    for (let i = 0; i < dayOfWeek; i++) {
+        calendarDates.insertAdjacentHTML('beforeend', '<div class="calendar-date other-month"></div>');
+    }
+
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     for (let i = 1; i <= daysInMonth; i++) {
         const date = new Date(currentYear, currentMonth, i);
-        const dateString = date.toISOString().split('T')[0];
+
+        // --- FIX IS HERE ---
+        // Manually format the date to YYYY-MM-DD to avoid timezone conversions from .toISOString()
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed, add 1
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
+        // --- END OF FIX ---
+        
         const dateElement = document.createElement('div');
         dateElement.className = 'calendar-date';
         dateElement.textContent = i;
+
         const isPublicHoliday = publicHolidays.some(h => h.date === dateString);
         const isAdditionalHoliday = additionalHolidays.includes(dateString);
-        if (isPublicHoliday) dateElement.classList.add('public-holiday');
-        if (isAdditionalHoliday) dateElement.classList.add('company-holiday');
+
+        if (isPublicHoliday) {
+            dateElement.classList.add('public-holiday');
+        }
+        if (isAdditionalHoliday) {
+            dateElement.classList.add('company-holiday');
+        }
+
         if (!isPublicHoliday) {
             dateElement.addEventListener('click', () => {
-                if (isAdditionalHoliday) { additionalHolidays = additionalHolidays.filter(d => d !== dateString); } else { additionalHolidays.push(dateString); }
+                if (isAdditionalHoliday) {
+                    additionalHolidays = additionalHolidays.filter(d => d !== dateString);
+                } else {
+                    additionalHolidays.push(dateString);
+                }
                 renderCalendar();
             });
         }
