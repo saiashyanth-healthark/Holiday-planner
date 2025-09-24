@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Holiday Planner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>
+            <div class="logo">H</div>
+            <div class="title-wrapper">
+                <span class="main-title">Holiday Planner</span>
+                <span class="sub-title">by Healthark</span>
+            </div>
+        </h1>
+    </div>
+
+    <div class="container">
+        <div class="planner-wrapper">
+            <div class="planner-section">
+                <div class="section-title">
+                    <span class="section-icon">✈️</span>
+                    Plan Your Holidays
+                </div>
+                <p class="text-muted">Fill out the form below to get an optimized holiday output.</p>
+
+                <div class="year-selector">
+                    <select id="yearSelect">
+                        <option value="2025" selected>2025</option>
+                        <option value="2026">2026</option>
+                    </select>
+                </div>
+
+                <div class="form-step">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <div class="step-title">Enter Your Paid Time Off</div>
+                    </div>
+                    <div class="step-description">How many paid days off (PTO) do you have available?</div>
+                    <div class="input-group">
+                        <input type="number" id="holidayCount" value="16" min="0" max="50">
+                    </div>
+                </div>
+
+                <div class="form-step">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <div class="step-title">Choose Your Holiday Strategy</div>
+                    </div>
+                    <div class="step-description">What kind of breaks do you prefer?</div>
+                    
+                    <div class="holiday-types">
+                        <div class="holiday-type-card selected" data-type="long-weekends">
+                            <div class="card-icon">🏛️</div>
+                            <div class="card-title">Long Weekends</div>
+                            <div class="card-description">3-4 day breaks</div>
+                        </div>
+                        <div class="holiday-type-card" data-type="mid-week">
+                            <div class="card-icon">🗓️</div>
+                            <div class="card-title">Mid-week Breaks</div>
+                            <div class="card-description">5-6 day breaks</div>
+                        </div>
+                        <div class="holiday-type-card" data-type="week-long">
+                            <div class="card-icon">📅</div>
+                            <div class="card-title">Week-long</div>
+                            <div class="card-description">7-9 day vacations</div>
+                        </div>
+                        <div class="holiday-type-card" data-type="extended">
+                            <div class="card-icon">🏝️</div>
+                            <div class="card-title">Extended</div>
+                            <div class="card-description">10-15 day trips</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-step">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <div class="step-title">Select Public Holidays</div>
+                    </div>
+                    <div class="step-description">Select your state to load official holidays. You can remove any you don't observe.</div>
+
+                    <div class="country-section">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Select State</label>
+                            <select id="stateSelect"></select>
+                        </div>
+
+                        <div class="holidays-detected">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span><strong>Public Holidays (<span id="holidayCountDisplay">0</span>)</strong></span>
+                            </div>
+                            <div class="holidays-list" id="holidaysList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-step">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <div class="step-title">Add Extra Company Holidays</div>
+                    </div>
+                    <div class="step-description">If your company offers extra days off, add them here.</div>
+
+                    <div class="calendar-section">
+                        <div class="calendar-header">
+                            <button class="calendar-nav" id="prevMonth">‹</button>
+                            <h3 id="calendarMonth">September 2025</h3>
+                            <button class="calendar-nav" id="nextMonth">›</button>
+                        </div>
+                        <div class="calendar">
+                            <div class="calendar-days">
+                                <div class="calendar-day-header">MO</div>
+                                <div class="calendar-day-header">TU</div>
+                                <div class="calendar-day-header">WE</div>
+                                <div class="calendar-day-header">TH</div>
+                                <div class="calendar-day-header">FR</div>
+                                <div class="calendar-day-header">SA</div>
+                                <div class="calendar-day-header">SU</div>
+                            </div>
+                            <div class="calendar-dates" id="calendarDates"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="generate-btn" id="generateResults">⚡ Generate My Holiday Plan</button>
+            </div>
+            
+            <div class="results-section" id="resultsSection">
+                <div class="results-content">
+                    <div class="section-title">
+                        <span class="section-icon">✨</span>
+                        Your Optimized Plan
+                    </div>
+                    <p class="text-muted">Here are the best ways to use your time off. Enjoy!</p>
+                    
+                    <h3 style="margin-top: 2rem; margin-bottom: 1rem; font-family: var(--font-heading);">Statistics</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Days Off</div>
+                            <div class="stat-value" id="totalDaysOff">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">PTO Days Used</div>
+                            <div class="stat-value" id="userHolidaysUsed">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Extra Holidays</div>
+                            <div class="stat-value" id="companyHolidaysUsed">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Strategy</div>
+                            <div class="stat-value capitalize" id="strategyType"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="weekend-cards" id="weekendResults"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <footer>
+      <p>
+        Inspired by the <a href="https://github.com/waqarkalim/holiday-optimizer" target="_blank" rel="noopener noreferrer">Holiday Optimizer on GitHub by Waqar Kalim</a>.
+      </p>
+    </footer>
+</body>
+</html>
