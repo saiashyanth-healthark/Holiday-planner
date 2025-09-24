@@ -273,7 +273,7 @@ async function generateResults() {
         userHolidays: additionalHolidays
     };
     try {
-        const response = await fetch('http://127.0.0.1:5000/api/optimize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(apiPayload) });
+        const response = await fetch('/api/optimize', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(apiPayload) });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const optimizedSuggestions = await response.json();
         document.querySelector('.planner-section').style.display = 'none';

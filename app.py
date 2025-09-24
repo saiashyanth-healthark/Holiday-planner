@@ -99,5 +99,5 @@ def optimize_holidays_api():
     results = find_optimal_holidays(year, pto_days, public_holidays, user_holidays, strategy)
     return jsonify(results)
 
-# if __name__ == '__main__':
-#     app.run(debug=True, port=5000)
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
