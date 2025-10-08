@@ -12,7 +12,6 @@ def index():
 
 # --- The Optimization Algorithm ---
 def find_optimal_holidays(year, pto_days_available, public_holidays_str, user_holidays_str, strategy):
-    # Now uses the real current date. It will always be up-to-date!
     today = date.today()
 
     public_holidays = {date.fromisoformat(h['date']) for h in public_holidays_str}
@@ -27,12 +26,10 @@ def find_optimal_holidays(year, pto_days_available, public_holidays_str, user_ho
     }
     params = strategy_params.get(strategy, strategy_params['week-long'])
 
-    # Scan into the next year to catch potential New Year's breaks
     start_date, end_date = date(year, 1, 1), date(year + 1, 1, 15)
     day_type = {}
     current_date = start_date
     while current_date <= end_date:
-        # Manually add next year's New Day as a holiday for planning
         if current_date in all_holidays or current_date == date(year + 1, 1, 1):
             day_type[current_date] = 'holiday'
         elif current_date.weekday() >= 5: # Saturday or Sunday
@@ -43,7 +40,7 @@ def find_optimal_holidays(year, pto_days_available, public_holidays_str, user_ho
 
     potential_vacations = []
     current_date = start_date + timedelta(days=1)
-    while current_date < date(year, 12, 31): # Only find gaps within the selected year
+    while current_date < date(year, 12, 31):
         if day_type.get(current_date) == 'workday' and day_type.get(current_date - timedelta(days=1)) != 'workday':
             gap_start = current_date
             gap_end = gap_start
@@ -70,10 +67,7 @@ def find_optimal_holidays(year, pto_days_available, public_holidays_str, user_ho
                     })
         current_date += timedelta(days=1)
     
-    # Filter out vacations that have already passed
     future_vacations = [vac for vac in potential_vacations if date.fromisoformat(vac['start_date']) >= today]
-
-    # Sort by the best score using the filtered list
     sorted_vacations = sorted(future_vacations, key=lambda x: x['score'], reverse=True)
     
     final_suggestions, used_dates, pto_remaining = [], set(), pto_days_available
@@ -98,6 +92,7 @@ def optimize_holidays_api():
     user_holidays = data.get('userHolidays', [])
     results = find_optimal_holidays(year, pto_days, public_holidays, user_holidays, strategy)
     return jsonify(results)
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

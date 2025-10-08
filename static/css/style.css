@@ -6,12 +6,11 @@
 /* --- 1. CSS Variables (Theme) --- */
 :root {
     --bg-color: #F8F9FA;
-    --primary-color: #007BFF; /* A calming, professional blue */
+    --primary-color: #007BFF;
     --text-color: #343A40;
     --text-muted: #6C757D;
     --card-bg: #FFFFFF;
     --border-color: #E9ECEF;
-    --success-color: #28a745;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
     --light-blue-bg: #F0F7FF;
@@ -319,28 +318,39 @@ input:focus, select:focus {
 .weekend-calendar-day.weekend { background: #E9ECEF; }
 .weekend-calendar-day.holiday { background: var(--warning-color); color: white; font-weight: 600; }
 
-.gcal-btn {
+.card-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+.calendar-btn {
+    flex-grow: 1;
     display: inline-block;
     text-align: center;
     text-decoration: none;
-    background-color: var(--bg-color);
-    color: var(--primary-color);
+    padding: 8px 12px;
     border: 1px solid var(--border-color);
-    padding: 8px 16px;
-    margin-top: 1rem;
-    width: 100%;
     border-radius: 8px;
     font-weight: 600;
     font-size: 0.9rem;
     transition: all 0.2s ease;
 }
-
-.gcal-btn:hover {
-    background-color: var(--light-blue-bg);
-    border-color: var(--primary-color);
-    color: #0056b3;
+.gcal-btn {
+    background-color: var(--bg-color);
+    color: #4285F4;
 }
-
+.gcal-btn:hover {
+    background-color: #F8F9FA;
+    border-color: #4285F4;
+}
+.outlook-btn {
+    background-color: var(--bg-color);
+    color: #0078D4;
+}
+.outlook-btn:hover {
+    background-color: #F8F9FA;
+    border-color: #0078D4;
+}
 
 /* --- 11. Responsive Adjustments --- */
 @media (max-width: 768px) {
@@ -358,14 +368,12 @@ footer {
     font-size: 0.85rem;
     color: var(--text-muted);
 }
-
 footer a {
     color: var(--primary-color);
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s ease;
 }
-
 footer a:hover {
     text-decoration: underline;
     opacity: 0.8;
